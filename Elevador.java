@@ -7,6 +7,7 @@ public class Elevador extends JFrame {
     private JButton[] botoesChamar;
     private JButton[] botoesAndar;
     private JTextArea display;
+    private ElevadorPanel[] elevadores;
 
     private int[] posicaoElevadores;
     private int[] direcaoElevadores;
@@ -18,12 +19,14 @@ public class Elevador extends JFrame {
         botoesChamar = new JButton[2];
         botoesAndar = new JButton[6];
         display = new JTextArea();
+        elevadores = new ElevadorPanel[2];
         posicaoElevadores = new int[]{0, 0}; // Posição inicial dos elevadores (Térreo)
         direcaoElevadores = new int[]{0, 0}; // 0 para parado, 1 para subindo, -1 para descendo
 
         // Configurando a interface gráfica
-        JPanel panel = new JPanel(new GridLayout(6, 2));
+        JPanel panel = new JPanel(new BorderLayout());
 
+        JPanel botoesPanel = new JPanel(new GridLayout(6, 2));
         for (int i = 0; i < 6; i++) {
             final int andar = i;
             botoesAndar[i] = new JButton(String.valueOf(i));
@@ -34,7 +37,7 @@ public class Elevador extends JFrame {
                     moverElevador(0, andarSolicitado);
                 }
             });
-            panel.add(botoesAndar[i]);
+            botoesPanel.add(botoesAndar[i]);
 
             botoesChamar[i % 2] = new JButton("Chamar");
             botoesChamar[i % 2].setBackground(Color.GREEN);
@@ -45,15 +48,23 @@ public class Elevador extends JFrame {
                     moverElevador(elevadorMaisProximo, andar);
                 }
             });
-            panel.add(botoesChamar[i % 2]);
+            botoesPanel.add(botoesChamar[i % 2]);
         }
 
-        display.setEditable(false);
-        add(panel, BorderLayout.NORTH);
-        add(new JScrollPane(display), BorderLayout.CENTER);
+        JPanel elevadoresPanel = new JPanel(new GridLayout(1, 2));
+        for (int i = 0; i < 2; i++) {
+            elevadores[i] = new ElevadorPanel(i + 1); // Passando o número do elevador
+            elevadoresPanel.add(elevadores[i]);
+        }
+
+        panel.add(botoesPanel, BorderLayout.WEST);
+        panel.add(elevadoresPanel, BorderLayout.CENTER);
+        panel.add(new JScrollPane(display), BorderLayout.SOUTH);
+
+        add(panel);
 
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setSize(600, 400);
+        setSize(800, 400);
         setVisible(true);
     }
 
@@ -89,7 +100,8 @@ public class Elevador extends JFrame {
                     }
                     andarAtual += direcaoElevadores[indiceElevador];
                     posicaoElevadores[indiceElevador] = andarAtual;
-                    display.setText("Elevador " + (indiceElevador + 1) + " chegou ao " + (andarAtual >= 0 ? "andar " + andarAtual : "subsolo") + "\n");
+                    elevadores[indiceElevador].setAndarAtual(andarAtual);
+                    display.setText(display.getText() + "Elevador " + (indiceElevador + 1) + " chegou ao " + (andarAtual >= 0 ? "andar " + andarAtual : "subsolo") + "\n");
                 }
                 display.append("Bem-vindo! Por favor, entre no Elevador " + (indiceElevador + 1) + "\n");
             }
@@ -103,5 +115,32 @@ public class Elevador extends JFrame {
                 new Elevador();
             }
         });
+    }
+}
+
+class ElevadorPanel extends JPanel {
+    private int andarAtual;
+    private int numeroElevador;
+
+    public ElevadorPanel(int numeroElevador) {
+        this.numeroElevador = numeroElevador;
+        setPreferredSize(new Dimension(100, 300));
+        setBackground(Color.LIGHT_GRAY);
+    }
+
+    public void setAndarAtual(int andarAtual) {
+        this.andarAtual = andarAtual;
+        repaint();
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
+        g.setColor(Color.WHITE);
+        g.fillRect(20, 50, 60, 200); // Elevador
+        g.setColor(Color.BLACK);
+        g.drawRect(20, 50, 60, 200); // Contorno do Elevador
+        g.drawString("Elevador " + numeroElevador, 10, 30); // Texto "Elevador"
+        g.drawString("Andar: " + andarAtual, 10, 270); // Texto "Andar"
     }
 }
