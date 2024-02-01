@@ -1,8 +1,11 @@
 package Elevador;
+
 import javax.swing.*;
 import java.awt.*;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+
+
 
 public class Elevador extends JFrame {
     private JButton[] botoesChamar;
@@ -17,9 +20,11 @@ public class Elevador extends JFrame {
         super("Sistema de Elevadores");
 
         // Inicializando variáveis
-        botoesChamar = new JButton[2];
+        botoesChamar = new JButton[6];
         botoesAndar = new JButton[6];
         display = new JTextArea();
+        JScrollPane scrollPane = new JScrollPane(display);
+        scrollPane.setVerticalScrollBarPolicy(JScrollPane.VERTICAL_SCROLLBAR_ALWAYS);
         elevadores = new ElevadorPanel[2];
         posicaoElevadores = new int[]{0, 0}; // Posição inicial dos elevadores (Térreo)
         direcaoElevadores = new int[]{0, 0}; // 0 para parado, 1 para subindo, -1 para descendo
@@ -40,16 +45,16 @@ public class Elevador extends JFrame {
             });
             botoesPanel.add(botoesAndar[i]);
 
-            botoesChamar[i % 2] = new JButton("Chamar");
-            botoesChamar[i % 2].setBackground(Color.GREEN);
-            botoesChamar[i % 2].addActionListener(new ActionListener() {
+            botoesChamar[i] = new JButton("Chamar");
+            botoesChamar[i].setBackground(Color.GREEN);
+            botoesChamar[i].addActionListener(new ActionListener() {
                 @Override
                 public void actionPerformed(ActionEvent e) {
                     int elevadorMaisProximo = obterElevadorMaisProximo(andar);
                     moverElevador(elevadorMaisProximo, andar);
                 }
             });
-            botoesPanel.add(botoesChamar[i % 2]);
+            botoesPanel.add(botoesChamar[i]);
         }
 
         JPanel elevadoresPanel = new JPanel(new GridLayout(1, 2));
@@ -60,7 +65,7 @@ public class Elevador extends JFrame {
 
         panel.add(botoesPanel, BorderLayout.WEST);
         panel.add(elevadoresPanel, BorderLayout.CENTER);
-        panel.add(new JScrollPane(display), BorderLayout.SOUTH);
+        panel.add(scrollPane, BorderLayout.SOUTH);
 
         add(panel);
 
@@ -102,7 +107,7 @@ public class Elevador extends JFrame {
                     andarAtual += direcaoElevadores[indiceElevador];
                     posicaoElevadores[indiceElevador] = andarAtual;
                     elevadores[indiceElevador].setAndarAtual(andarAtual);
-                    display.setText(display.getText() + "Elevador " + (indiceElevador + 1) + " chegou ao " + (andarAtual >= 0 ? "andar " + andarAtual : "subsolo") + "\n");
+                    display.append("Elevador " + (indiceElevador + 1) + " chegou ao " + (andarAtual >= 0 ? "andar " + andarAtual : "subsolo") + "\n");
                 }
                 display.append("Bem-vindo! Por favor, entre no Elevador " + (indiceElevador + 1) + "\n");
             }
